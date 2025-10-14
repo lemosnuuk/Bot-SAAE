@@ -1,0 +1,22 @@
+{
+  "name": "saae-bot-triagem",
+  "version": "1.0.0",
+  "description": "Bot de triagem para WhatsApp com botões clicáveis",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "triagem",
+    "automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "whatsapp-web.js": "^1.23.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
+
