@@ -1,18 +1,19 @@
 # 🤖 Bot de Triagem SAAE - WhatsApp
 
-Bot automatizado de triagem para WhatsApp com interface de botões clicáveis, desenvolvido com Node.js e whatsapp-web.js.
+Bot automatizado de triagem para WhatsApp com menu interativo de opções numeradas, desenvolvido com Node.js e whatsapp-web.js.
 
 ## 📋 Funcionalidades
 
 - ✅ Conexão via QR Code (apenas na primeira vez)
 - ✅ Sessão persistente (não precisa escanear QR Code toda vez)
-- ✅ Menu interativo com botões clicáveis
+- ✅ Menu interativo com opções numeradas (1, 2, 3)
 - ✅ Triagem automática para setores:
   - 💰 Faturas
   - ❓ Dúvidas e Informações
   - 📢 Reportes
 - ✅ Notificação automática para responsáveis de cada setor
 - ✅ Mensagens de confirmação para o cliente
+- ✅ Logs detalhados de todas as interações
 
 ## 🚀 Instalação
 
@@ -26,10 +27,15 @@ Bot automatizado de triagem para WhatsApp com interface de botões clicáveis, d
 
 1. **Clone ou baixe este repositório**
 
+```bash
+git clone https://github.com/CAFFD/SAAE---Bot.git
+cd SAAE---Bot
+```
+
 2. **Instale as dependências:**
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 ## ⚙️ Configuração
 
@@ -37,7 +43,7 @@ Bot automatizado de triagem para WhatsApp com interface de botões clicáveis, d
 
 Antes de iniciar o bot, você precisa configurar os números de WhatsApp dos responsáveis por cada setor.
 
-Abra o arquivo `bot.js` e edite a seção de configuração no topo do arquivo:
+Abra o arquivo `bot.js` e edite a seção de configuração no topo do arquivo (linhas 13-17):
 
 ```javascript
 const RESPONSAVEIS = {
@@ -81,27 +87,47 @@ Na primeira execução, um QR Code será exibido no terminal:
 3. Toque em **Conectar um aparelho**
 4. Escaneie o QR Code exibido no terminal
 
+⏳ **Aguarde 20-40 segundos** para o QR Code aparecer (o Puppeteer precisa inicializar o navegador automatizado).
+
 ### 3. Próximas Execuções
 
 Nas próximas vezes, o bot se conectará automaticamente usando a sessão salva. Não será necessário escanear o QR Code novamente.
 
 ### 4. Funcionamento
 
-- **Cliente envia qualquer mensagem** → Bot responde com menu de botões
-- **Cliente clica em um botão** → Bot:
-  1. Envia mensagem de confirmação para o cliente
-  2. Notifica o responsável do setor com os dados do cliente
+1. **Cliente envia qualquer mensagem** → Bot responde com menu de opções
+2. **Cliente digita 1, 2 ou 3** → Bot:
+   - Envia mensagem de confirmação para o cliente
+   - Notifica o responsável do setor com os dados do cliente
 
 ## 📱 Exemplo de Uso
 
-**Cliente:** "Olá"
+### Passo 1: Cliente inicia conversa
 
-**Bot:** (Envia menu com botões)
-- Faturas
-- Dúvidas e Informações
-- Reportes
+**Cliente:** "Olá" (ou qualquer mensagem)
 
-**Cliente:** (Clica em "Faturas")
+**Bot responde:**
+```
+┌─────────────────────────────────┐
+│  🤖 ATENDIMENTO AUTOMATIZADO    │
+└─────────────────────────────────┘
+
+Olá! 👋 Bem-vindo(a) ao atendimento SAAE.
+
+Por favor, digite o número da opção desejada:
+
+1 - 💰 Faturas
+2 - ❓ Dúvidas e Informações  
+3 - 📢 Reportes
+
+Digite apenas o número (1, 2 ou 3)
+```
+
+### Passo 2: Cliente escolhe opção
+
+**Cliente:** `1`
+
+### Passo 3: Bot processa e notifica
 
 **Bot para o Cliente:**
 ```
@@ -117,8 +143,9 @@ Obrigado pela sua paciência! 🙏
 ```
 🔔 NOVA SOLICITAÇÃO - FATURAS
 
-📱 Cliente: 5519912345678
-⏰ Horário: 14/10/2025 10:30:45
+👤 Cliente: João Silva
+📱 Número: 5519912345678
+⏰ Horário: 14/10/2025 15:44:21
 
 O cliente está aguardando atendimento. Por favor, entre em contato.
 ```
@@ -128,21 +155,28 @@ O cliente está aguardando atendimento. Por favor, entre em contato.
 ### Erro de Autenticação
 
 Se houver problemas de autenticação:
-1. Feche o bot
+1. Feche o bot (Ctrl+C no terminal)
 2. Delete a pasta `.wwebjs_auth`
 3. Reinicie o bot e escaneie o QR Code novamente
 
 ### Bot não responde
 
-- Verifique se o bot está conectado (veja a mensagem "BOT CONECTADO COM SUCESSO!")
+- Verifique se o bot está conectado (veja a mensagem "✓ BOT CONECTADO COM SUCESSO!")
 - Verifique se o número está no formato correto: `55DDDNUMERO@c.us`
 - Certifique-se de que o bot não está bloqueado no WhatsApp
+- Verifique os logs no terminal para identificar erros
 
-### Botões não aparecem
+### QR Code não aparece
 
-Se os botões não aparecerem para alguns usuários:
-- Verifique se o WhatsApp do cliente está atualizado
-- A funcionalidade de botões requer uma versão recente do WhatsApp
+Se o QR Code demorar muito ou não aparecer:
+- Aguarde até 40 segundos (o Puppeteer precisa baixar o Chromium na primeira vez)
+- Verifique sua conexão com a internet
+- Tente rodar: `type bot.js | node` (Windows) ou `cat bot.js | node` (Linux/Mac)
+- Verifique se não há firewall bloqueando
+
+### Opção Inválida
+
+Se o usuário digitar algo diferente de 1, 2 ou 3, o bot automaticamente reenvia o menu com as opções.
 
 ## 📦 Dependências
 
@@ -155,10 +189,12 @@ Se os botões não aparecerem para alguns usuários:
 - ⚠️ Não feche o terminal enquanto o bot estiver em uso
 - ⚠️ A pasta `.wwebjs_auth` contém dados sensíveis da sessão - não compartilhe
 - ⚠️ Para uso em produção, considere usar PM2 ou similar para manter o bot ativo
+- ℹ️ O bot ignora mensagens enviadas por ele mesmo e status do WhatsApp
+- ℹ️ Todos os logs são exibidos no console para facilitar o monitoramento
 
 ## 🔄 Manter o Bot Ativo 24/7
 
-Para manter o bot rodando continuamente, recomenda-se usar o PM2:
+Para manter o bot rodando continuamente em produção, recomenda-se usar o PM2:
 
 ```bash
 # Instalar PM2 globalmente
@@ -170,7 +206,7 @@ pm2 start bot.js --name saae-bot
 # Ver status
 pm2 status
 
-# Ver logs
+# Ver logs em tempo real
 pm2 logs saae-bot
 
 # Parar o bot
@@ -178,18 +214,69 @@ pm2 stop saae-bot
 
 # Reiniciar o bot
 pm2 restart saae-bot
+
+# Remover do PM2
+pm2 delete saae-bot
+
+# Configurar para iniciar automaticamente ao reiniciar o servidor
+pm2 startup
+pm2 save
 ```
+
+## 🧪 Arquivo de Teste
+
+O repositório inclui um arquivo `teste-simples.js` para testar a conexão básica com o WhatsApp sem toda a lógica do bot. Para usar:
+
+```bash
+node teste-simples.js
+```
+
+Este arquivo é útil para:
+- Verificar se as dependências estão instaladas corretamente
+- Testar a conexão com WhatsApp
+- Identificar problemas antes de rodar o bot completo
+
+## 📂 Estrutura do Projeto
+
+```
+SAAE---Bot/
+├── bot.js              # Bot principal com lógica de triagem
+├── teste-simples.js    # Script de teste de conexão
+├── package.json        # Dependências do projeto
+├── package-lock.json   # Lock de versões
+├── README.md           # Este arquivo
+├── .gitignore          # Arquivos ignorados pelo Git
+└── .wwebjs_auth/       # Pasta de sessão (não versionada)
+```
+
+## 🚀 Melhorias Futuras
+
+Possíveis melhorias para implementar:
+
+- [ ] Adicionar banco de dados para histórico de atendimentos
+- [ ] Implementar horário de funcionamento (fora do horário envia mensagem automática)
+- [ ] Adicionar mais setores de atendimento
+- [ ] Criar dashboard web para monitoramento
+- [ ] Implementar respostas automáticas para perguntas frequentes
+- [ ] Adicionar sistema de fila de atendimento
 
 ## 📄 Licença
 
 ISC
 
-## 👨‍💻 Suporte
+## 👨‍💻 Suporte e Documentação
 
-Para dúvidas ou problemas, consulte a documentação do whatsapp-web.js:
-https://wwebjs.dev/
+- **Documentação do whatsapp-web.js:** https://wwebjs.dev/
+- **Repositório oficial:** https://github.com/pedroslopez/whatsapp-web.js
+- **Issues do projeto:** https://github.com/CAFFD/SAAE---Bot/issues
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
 
 ---
 
-Desenvolvido com ❤️ para SAAE
+**Desenvolvido com ❤️ para SAAE**
 
+**Versão:** 1.0.0  
+**Última atualização:** Outubro 2025
